@@ -1063,6 +1063,8 @@ func (r *Replica) clearSubsumedReplicaDiskData(
 			subsumedReplSSTFile := &engine.MemFile{}
 			subsumedReplSST := engine.MakeIngestionSSTWriter(subsumedReplSSTFile)
 			defer subsumedReplSST.Close()
+			//span := roachpb.Span{Key: keyRanges[i].Start.Key, EndKey: keyRanges[i].End.Key}
+			//if span, empty := rditer.ConstrainToKeys(r.Engine(), roachpb.Span{Key: keyRanges[i].Start.Key, EndKey: keyRanges[i].End.Key}); !empty {
 			if err := engine.ClearRangeWithHeuristic(
 				r.store.Engine(),
 				&subsumedReplSST,
@@ -1072,6 +1074,7 @@ func (r *Replica) clearSubsumedReplicaDiskData(
 				subsumedReplSST.Close()
 				return err
 			}
+			//}
 			if err := subsumedReplSST.Finish(); err != nil {
 				return err
 			}

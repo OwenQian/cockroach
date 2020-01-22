@@ -92,7 +92,6 @@ func (s *SSTSnapshotStorageScratch) NewFile(
 ) (*SSTSnapshotStorageFile, error) {
 	id := len(s.ssts)
 	filename := s.filename(id)
-	s.ssts = append(s.ssts, filename)
 	f := &SSTSnapshotStorageFile{
 		scratch:   s,
 		filename:  filename,
@@ -137,13 +136,14 @@ func (s *SSTSnapshotStorageScratch) Clear() error {
 // SSTSnapshotStorageFile is an SST file managed by a
 // SSTSnapshotStorageScratch.
 type SSTSnapshotStorageFile struct {
-	scratch   *SSTSnapshotStorageScratch
-	created   bool
-	file      engine.File
-	filename  string
-	ctx       context.Context
-	chunkSize int64
-	buffer    []byte
+	scratch      *SSTSnapshotStorageScratch
+	created      bool
+	containsKeys bool
+	file         engine.File
+	filename     string
+	ctx          context.Context
+	chunkSize    int64
+	buffer       []byte
 }
 
 func (f *SSTSnapshotStorageFile) openFile() error {
@@ -164,6 +164,7 @@ func (f *SSTSnapshotStorageFile) openFile() error {
 	}
 	f.file = file
 	f.created = true
+	f.scratch.ssts = append(f.scratch.ssts, f.filename)
 	return nil
 }
 
